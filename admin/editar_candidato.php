@@ -266,7 +266,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <!-- Botones de acción -->
         <div class="botones">
             <button type="submit">Actualizar</button>
-            <a href="listas.php" class="boton-cancelar">Cancelar</a>
+            <a href="candidatos.php" class="boton-cancelar">Cancelar</a>
         </div>
     </form>
 

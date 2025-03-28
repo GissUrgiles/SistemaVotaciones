@@ -13,6 +13,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $cargo = $_POST["cargo"];
     $foto = "";
 
+    // Validaciones para nombre y apellido (solo letras y espacios)
+    if (!preg_match("/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/", $nombre)) {
+        echo "<script>alert('El nombre solo puede contener letras y espacios.'); window.history.back();</script>";
+        exit();
+    }
+
+    if (!preg_match("/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/", $apellido)) {
+        echo "<script>alert('El apellido solo puede contener letras y espacios.'); window.history.back();</script>";
+        exit();
+    }
+
     // Manejo de subida de imagen
     if (!empty($_FILES["foto"]["name"])) {
         $directorio = "../uploads/";

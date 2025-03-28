@@ -42,6 +42,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $vicepresidente_id = $_POST["vicepresidente"];
     $foto_lista = $lista["foto_lista"]; // Mantener la foto actual si no se actualiza
 
+    // Validaciones
+    // Verificar que el nombre de la lista solo contenga letras y espacios
+    if (!preg_match("/^[a-zA-Z\s]+$/", $nombre_lista)) {
+        echo "<script>alert('El nombre de la lista solo puede contener letras y espacios.'); window.history.back();</script>";
+        exit();
+    }
+
+    // Verificar que el número de lista sea solo números de 1 a 99
+    if (!preg_match("/^\d{1,2}$/", $numero_lista)) {
+        echo "<script>alert('El número de la lista debe ser un número entre 1 y 99.'); window.history.back();</script>";
+        exit();
+    }
+
     // Verificar que el presidente y vicepresidente sean diferentes
     if ($presidente_id == $vicepresidente_id) {
         echo "<script>alert('El Presidente y Vicepresidente deben ser diferentes.'); window.history.back();</script>";
@@ -55,10 +68,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $ruta_archivo = $directorio . $foto_nombre;
         $ruta_foto_bd = "uploads/" . $foto_nombre;
 
+        // Verificar que el archivo subido sea una imagen
+        $imagen_info = getimagesize($_FILES["foto_lista"]["tmp_name"]);
+        if ($imagen_info === false) {
+            echo "<script>alert('El archivo no es una imagen válida.'); window.history.back();</script>";
+            exit();
+        }
+
         if (move_uploaded_file($_FILES["foto_lista"]["tmp_name"], $ruta_archivo)) {
             $foto_lista = $ruta_foto_bd; // Actualizar la ruta en la base de datos
         } else {
             echo "<script>alert('Error al subir la imagen.');</script>";
+            exit();
         }
     }
 
@@ -262,4 +283,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </form>
 
 </body>
-</html>
+</html> 
