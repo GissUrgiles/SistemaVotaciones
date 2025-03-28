@@ -10,7 +10,16 @@ if (!isset($_SESSION["usuario"]) || $_SESSION["tipo_usuario"] !== "admin") {
 include '../includes/conexion.php';
 
 function obtenerDatosReporte($conn, $columna) {
-    $sql = "SELECT $columna, SUM(cantidad_votos) as total_votos FROM informe_votos GROUP BY $columna";
+    // Si la columna es 'nombre_lista', usamos una consulta JOIN
+    if ($columna === 'nombre_lista') {
+        $sql = "SELECT listas.nombre_lista, SUM(informe_votos.cantidad_votos) as total_votos 
+                FROM informe_votos 
+                JOIN listas ON informe_votos.id_lista = listas.id 
+                GROUP BY listas.nombre_lista";
+    } else {
+        $sql = "SELECT $columna, SUM(cantidad_votos) as total_votos FROM informe_votos GROUP BY $columna";
+    }
+
     $resultado = $conn->query($sql);
     $datos = [];
 
@@ -25,6 +34,9 @@ function obtenerDatosReporte($conn, $columna) {
 $datosProvincia = obtenerDatosReporte($conn, 'provincia');
 $datosCiudad = obtenerDatosReporte($conn, 'ciudad');
 $datosGenero = obtenerDatosReporte($conn, 'genero');
+
+// Obtener votos por lista (nuevo reporte)
+$datosLista = obtenerDatosReporte($conn, 'nombre_lista');
 
 $conn->close();
 ?>
@@ -49,7 +61,7 @@ $conn->close();
         .top-bar {
             width: 100%;
             background: linear-gradient(to right, #9933ff, #ff66b2, #6699ff);
-            padding: 10px 20px; /* Reducido el tamaño de la barra */
+            padding: 10px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -63,13 +75,13 @@ $conn->close();
         .top-bar h1 {
             color: white;
             margin: 0;
-            font-size: 24px; /* Reducido el tamaño del título */
+            font-size: 24px;
         }
 
         .logout-button {
             background-color: rgba(255, 255, 255, 0.7);
             border: none;
-            padding: 8px 15px; /* Reducido el tamaño del botón */
+            padding: 8px 15px;
             border-radius: 6px;
             cursor: pointer;
             font-weight: bold;
@@ -83,7 +95,7 @@ $conn->close();
         h1 {
             text-align: center;
             color: #9933ff;
-            margin-top: 80px; /* Ajuste para que no se superponga con la barra superior */
+            margin-top: 80px;
         }
 
         h2 {
@@ -116,7 +128,7 @@ $conn->close();
             border-radius: 6px;
             font-size: 16px;
             font-weight: bold;
-            margin-top: 10px; /* Bajar más el botón Volver al Panel */
+            margin-top: 10px;
             text-align: center;
             transition: background-color 0.3s ease;
         }
@@ -134,9 +146,8 @@ $conn->close();
         <a href="../loginSesiones/logout.php" class="logout-button">Cerrar sesión</a>
     </div>
 
-    <!-- Botón Volver al Panel -->
+       <!-- Botón Volver al Panel -->
     <a href="dashboard.php" style="display: inline-block; text-decoration: none; background-color: #9933ff; color: white; padding: 12px 20px; border-radius: 6px; font-size: 16px; font-weight: bold; margin-top: 60px; text-align: center; transition: background-color 0.3s ease;">Volver</a>
-
 
     <!-- Gráfico por Provincia -->
     <div class="grafico-container">
@@ -154,6 +165,12 @@ $conn->close();
     <div class="grafico-container">
         <h2>Votos por Género</h2>
         <canvas id="graficoGenero"></canvas>
+    </div>
+
+    <!-- Gráfico por Lista -->
+    <div class="grafico-container">
+        <h2>Votos por Lista</h2>
+        <canvas id="graficoLista"></canvas>
     </div>
 
     <script>
@@ -248,6 +265,37 @@ $conn->close();
                     label: 'Votos por Género',
                     data: valoresGenero,
                     backgroundColor: ['#ff6384', '#36a2eb', '#ffcd56'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            font: {
+                                size: 14
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Datos de Lista
+        const datosLista = <?php echo json_encode($datosLista); ?>;
+        const etiquetasLista = datosLista.map(d => d.nombre_lista);
+        const valoresLista = datosLista.map(d => d.total_votos);
+
+        new Chart(document.getElementById('graficoLista'), {
+            type: 'pie',
+            data: {
+                labels: etiquetasLista,
+                datasets: [{
+                    label: 'Votos por Lista',
+                    data: valoresLista,
+                    backgroundColor: ['#ff6384', '#36a2eb', '#ffcd56', '#4bc0c0'],
                     borderWidth: 1
                 }]
             },
