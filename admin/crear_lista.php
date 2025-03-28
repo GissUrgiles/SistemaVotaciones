@@ -202,12 +202,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 
     <h1>Crear Nueva Lista</h1>
-    <form action="crear_lista.php" method="POST" enctype="multipart/form-data">
+    <form action="crear_lista.php" method="POST" enctype="multipart/form-data" onsubmit="return validarFormulario()">
         <label>Nombre de la Lista:</label>
-        <input type="text" name="nombre_lista" required>
+        <input type="text" name="nombre_lista" required id="nombre_lista" oninput="validarSoloLetras(this)">
 
         <label>Número de Lista:</label>
-        <input type="number" name="numero_lista" required>
+        <input type="number" name="numero_lista" required id="numero_lista" oninput="validarSoloNumeros(this)">
 
         <label>Foto Representativa:</label>
         <input type="file" name="foto_lista" accept="image/*">
@@ -231,6 +231,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <button type="submit">Crear Lista</button>
         <a href="listas.php" class="boton-cancelar">Cancelar</a>
     </form>
+
+    <script>
+        function validarFormulario() {
+            // Validar que todos los campos requeridos estén llenos
+            let nombreLista = document.getElementById("nombre_lista").value;
+            let numeroLista = document.getElementById("numero_lista").value;
+            if (!nombreLista || !numeroLista) {
+                alert("Todos los campos son requeridos.");
+                return false;
+            }
+            return true;
+        }
+
+        function validarSoloLetras(input) {
+            // Solo permitir letras (sin números ni caracteres especiales)
+            input.value = input.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, "");
+        }
+
+        function validarSoloNumeros(input) {
+            // Solo permitir números
+            input.value = input.value.replace(/[^0-9]/g, "");
+        }
+    </script>
 
 </body>
 </html>

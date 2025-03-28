@@ -35,7 +35,31 @@ $stmt->execute();
 $resultado = $stmt->get_result();
 
 if ($resultado->num_rows > 0) {
-    echo "<p style='text-align: center; font-size: 18px;'>✅ Usted ya ha votado. <a href='../loginSesiones/logout.php'>Cerrar sesión</a></p>";
+    echo "<p style='text-align: center; font-size: 18px;'>Usted ya ha votado. <a href='../loginSesiones/logout.php'>Cerrar sesión</a></p>";
+    exit();
+}
+
+// Obtener la hora actual del servidor
+$hora_actual = (int)date('H');
+
+// Verificar si la hora actual está dentro del rango permitido (8:00 AM - 6:00 PM)
+if ($hora_actual < 8 || $hora_actual >= 18) {
+    echo "<p style='text-align: center; font-size: 18px;'>El horario de votación es de 8:00 AM a 6:00 PM. Intente nuevamente en el horario habilitado.</p>";
+    exit();
+}
+
+// Procesar el voto cuando el formulario es enviado
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_lista'])) {
+    $id_lista = $_POST['id_lista'];
+
+    // Registrar el voto en la base de datos
+    $sql = "INSERT INTO votos (id_votante, id_lista) VALUES (?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $id_votante, $id_lista);
+    $stmt->execute();
+
+    // Mensaje de confirmación de voto y enlace para cerrar sesión
+    echo "<p style='text-align: center; font-size: 18px;'>¡Voto registrado exitosamente! <a href='../loginSesiones/logout.php'>Cerrar sesión</a></p>";
     exit();
 }
 
@@ -58,7 +82,7 @@ $listas = $conn->query($sql);
 
 // Verificar si hay listas disponibles
 if (!$listas || $listas->num_rows === 0) {
-    echo "<p style='text-align: center; font-size: 18px;'>❌ No hay listas disponibles para votar.</p>";
+    echo "<p style='text-align: center; font-size: 18px;'>No hay listas disponibles para votar.</p>";
     exit();
 }
 ?>

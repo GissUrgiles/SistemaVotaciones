@@ -43,29 +43,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     if (!validarCedulaEcuatoriana($cedula)) {
-        die("<p style='color:red;'>❌ La cédula ingresada no es válida. <a href='registro.php'>Intentar de nuevo</a></p>");
+        die("<p style='color:red;'>La cédula ingresada no es válida. <a href='registro.php'>Intentar de nuevo</a></p>");
     }
 
     // Validar que nombre y apellido solo contengan letras
     if (!preg_match("/^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$/", $nombre) || !preg_match("/^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$/", $apellido)) {
-        die("<p style='color:red;'>❌ El nombre y el apellido solo pueden contener letras. <a href='registro.php'>Intentar de nuevo</a></p>");
+        die("<p style='color:red;'>El nombre y el apellido solo pueden contener letras. <a href='registro.php'>Intentar de nuevo</a></p>");
     }
 
     // Validar provincia y ciudad (solo letras)
     if (!preg_match("/^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$/", $provincia) || !preg_match("/^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$/", $ciudad)) {
-        die("<p style='color:red;'>❌ La provincia y ciudad solo pueden contener letras. <a href='registro.php'>Intentar de nuevo</a></p>");
+        die("<p style='color:red;'>La provincia y ciudad solo pueden contener letras. <a href='registro.php'>Intentar de nuevo</a></p>");
     }
 
     // Validar fecha de nacimiento (mayor de 16 años)
     $fecha_actual = new DateTime();
     $fecha_nacimiento_dt = DateTime::createFromFormat('Y-m-d', $fecha_nacimiento);
     if (!$fecha_nacimiento_dt || $fecha_nacimiento_dt > $fecha_actual->modify('-16 years')) {
-        die("<p style='color:red;'>❌ Debes tener al menos 16 años para registrarte. <a href='registro.php'>Intentar de nuevo</a></p>");
+        die("<p style='color:red;'>Debes tener al menos 16 años para registrarte. <a href='registro.php'>Intentar de nuevo</a></p>");
     }
 
     // Validar contraseña (mínimo 6 caracteres)
     if (strlen($clave) < 6) {
-        die("<p style='color:red;'>❌ La contraseña debe tener al menos 6 caracteres. <a href='registro.php'>Intentar de nuevo</a></p>");
+        die("<p style='color:red;'>La contraseña debe tener al menos 6 caracteres. <a href='registro.php'>Intentar de nuevo</a></p>");
     }
 
     // Encriptar la contraseña con Bcrypt
@@ -78,7 +78,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
-        die("<p style='color:red;'>❌ Esta cédula ya está registrada. <a href='login.php'>Iniciar sesión</a></p>");
+        die("<p style='color:red;'>Esta cédula ya está registrada. <a href='login.php'>Iniciar sesión</a></p>");
     }
 
     // Insertar en la base de datos
@@ -86,9 +86,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->bind_param("ssssssss", $cedula, $nombre, $apellido, $genero, $fecha_nacimiento, $provincia, $ciudad, $clave_hash);
 
     if ($stmt->execute()) {
-        echo "<p style='color:green;'>✅ Registro exitoso. <a href='login.php'>Iniciar sesión</a></p>";
+        echo "<p style='color:green;'>Registro exitoso. <a href='login.php'>Iniciar sesión</a></p>";
     } else {
-        echo "<p style='color:red;'>❌ Error al registrar el usuario: " . $conn->error . "</p>";
+        echo "<p style='color:red;'>Error al registrar el usuario: " . $conn->error . "</p>";
     }
 
     $stmt->close();

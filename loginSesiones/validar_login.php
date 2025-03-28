@@ -15,7 +15,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Validar que no estén vacíos
     if (empty($cedula_o_usuario) || empty($clave)) {
-        die("❌ Todos los campos son obligatorios. <a href='login.php'>Intentar de nuevo</a>");
+        die("Todos los campos son obligatorios. <a href='login.php'>Intentar de nuevo</a>");
     }
 
     // 🔹 Verificar si es un votante
@@ -35,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             header("Location: ../votante/votar.php");
             exit();
         } else {
-            die("❌ Contraseña incorrecta. <a href='login.php'>Intentar de nuevo</a>");
+            die("Contraseña incorrecta. <a href='login.php'>Intentar de nuevo</a>");
         }
     }
 
@@ -56,12 +56,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             header("Location: ../admin/dashboard.php");
             exit();
         } else {
-            die("❌ Contraseña incorrecta. <a href='login.php'>Intentar de nuevo</a>");
+            die("Contraseña incorrecta. <a href='login.php'>Intentar de nuevo</a>");
         }
     }
 
     // ❌ Si no se encuentra en votantes ni administradores
-    die("❌ Usuario o cédula no registrados. <a href='login.php'>Intentar de nuevo</a>");
+    die("Usuario o cédula no registrados. <a href='login.php'>Intentar de nuevo</a>");
 }
 
 $conn->close();
