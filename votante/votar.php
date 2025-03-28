@@ -12,7 +12,7 @@ if (!isset($_SESSION['usuario'])) {
 $cedula = $_SESSION['usuario'];
 
 // Obtener el ID del votante desde la base de datos
-$sql = "SELECT id FROM votantes WHERE cedula = ?";
+$sql = "SELECT id, provincia, ciudad, genero FROM votantes WHERE cedula = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $cedula);
 $stmt->execute();
@@ -26,6 +26,9 @@ if ($resultado->num_rows === 0) {
 
 $fila = $resultado->fetch_assoc();
 $id_votante = $fila['id'];
+$provincia = $fila['provincia'];
+$ciudad = $fila['ciudad'];
+$genero = $fila['genero'];
 
 // Verificar si el votante ya ha votado
 $sql = "SELECT id FROM votos WHERE id_votante = ?";
@@ -52,10 +55,18 @@ if ($hora_actual < 8 || $hora_actual >= 18) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_lista'])) {
     $id_lista = $_POST['id_lista'];
 
-    // Registrar el voto en la base de datos
+    // Registrar el voto en la tabla votos
     $sql = "INSERT INTO votos (id_votante, id_lista) VALUES (?, ?)";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ii", $id_votante, $id_lista);
+    $stmt->execute();
+
+    // Registrar el voto en la tabla informe_votos
+    $sql = "INSERT INTO informe_votos (provincia, ciudad, genero, id_lista, cantidad_votos)
+            VALUES (?, ?, ?, ?, 1)
+            ON DUPLICATE KEY UPDATE cantidad_votos = cantidad_votos + 1";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("sssi", $provincia, $ciudad, $genero, $id_lista);
     $stmt->execute();
 
     // Mensaje de confirmación de voto y enlace para cerrar sesión
